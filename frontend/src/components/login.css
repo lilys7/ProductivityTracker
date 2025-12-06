@@ -1,0 +1,111 @@
+.login-page {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    background: linear-gradient(
+      135deg,
+      #5c6cff,
+      #bc84ff,
+      #e6a270
+    );
+  }
+  
+  .login-card {
+    background: white;
+    width: 420px;
+    border-radius: 18px;
+    padding: 40px 36px;
+    text-align: center;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
+  }
+  
+  .login-icon {
+    background: #6868fe;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    color: white;
+  }
+  
+  .subtitle {
+    margin-bottom: 30px;
+    color: gray;
+    font-size: 14px;
+  }
+  
+
+  form {
+    text-align: left;
+  }
+  
+  label {
+    margin-left: 4px;
+    margin-bottom: 4px;
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  
+  input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid #e1e1e9;
+    margin-bottom: 14px;
+    font-size: 15px;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #7b6ffc;
+  }
+  
+
+  .login-btn {
+    width: 100%;
+    background: #7167ff;
+    color: white;
+    border: none;
+    padding: 14px 0;
+    margin-top: 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  
+  .login-btn:hover {
+    background: #655af7;
+  }
+  
+  .google-btn {
+    width: 100%;
+    background: white;
+    border: 2px solid #ededf4;
+    color: black;
+    padding: 14px 0;
+    margin-top: 18px;
+    border-radius: 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .links {
+    margin-top: 24px;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .links a {
+    text-decoration: none;
+    color: #5858ff;
+  }
+  

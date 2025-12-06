@@ -23,8 +23,5 @@ app.add_middleware(
 def root():
     return {"Hello" : "World this app is working"}
 
-@app.get("/poop")
-def poop():
-    return {"Poop"}
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
