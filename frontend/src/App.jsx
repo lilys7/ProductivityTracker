@@ -7,7 +7,10 @@ import Login from "./components/Login";
 import { Routes, Route } from "react-router-dom";
 import GetStarted from "./components/GetStarted";
 import SelectHabits from "./components/SelectHabits";
-import JoinFriends from './components/JoinFriends'
+import JoinFriends from './components/JoinFriends';
+import CreateGroup from './components/CreateGroup'
+import JoinGroup from './components/JoinGroup'
+
 
 
 function App() {
@@ -19,6 +22,8 @@ function App() {
       <Route path="/get-started" element={<GetStarted />} />
       <Route path="/select-habits" element={<SelectHabits />} />
       <Route path="/join-friends" element={<JoinFriends />} />
+      <Route path="/create-group" element={<CreateGroup />} />
+      <Route path="/join-group" element={<JoinGroup />} />
     </Routes>
   );
 }

@@ -9,7 +9,7 @@ export default function JoinFriends() {
 
   const handleContinue = () => {
     if (selected === "create") navigate("/create-group");
-    if (selected === "join") navigate("/join-group-code");
+    if (selected === "join") navigate("/join-group");
   }
 
   return (
@@ -59,7 +59,8 @@ export default function JoinFriends() {
         <button
           disabled={!selected}
           className={`join-continue ${selected ? "enabled" : ""}`}
-          onClick={handleContinue}
+          //clicks accoridng to the two routes defined above
+          onClick={(handleContinue)}
         >
           Continue
         </button>

@@ -1,0 +1,88 @@
+.cg-page {
+    min-height:100vh;
+    background:linear-gradient(135deg,#5c6cff,#bc84ff,#e6a270);
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding-top:10px;
+  }
+  
+  .cg-card{
+    background:white;
+    width:700px;
+    padding:40px 60px 65px;
+    border-radius:26px;
+    box-shadow:0 12px 36px rgba(0,0,0,.15);
+  }
+  
+  .cg-steps{
+    display:flex;
+    gap:18px;
+    margin-bottom:40px;
+  }
+  .cg-step{
+    height:6px; flex:1;
+    background:#e1e1e9;
+    border-radius:999px;
+  }
+  .cg-step.active{
+    background:#6c63ff;
+  }
+  
+  .cg-sub{
+    color:#777;
+    margin-bottom:40px;
+  }
+  
+  .cg-label{
+    display:block;
+    margin-bottom:6px;
+    font-size:15px;
+  }
+  
+  .cg-input{
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:1px solid #deddf6;
+    margin-bottom:26px;
+    font-size:16px;
+  }
+  
+  .cg-btn-outline{
+    width:100%;
+    background:white;
+    border:2px solid #deddf6;
+    border-radius:14px;
+    padding:16px 0;
+    margin-bottom:16px;
+    font-size:17px;
+    cursor:pointer;
+  }
+  
+  .cg-btn-light{
+    width:100%;
+    background:#cfc9ff;
+    border:none;
+    color:white;
+    padding:16px 0;
+    border-radius:14px;
+    font-size:17px;
+    cursor:not-allowed;
+    transition:background .25s;
+  }
+  
+  .cg-btn-light.enabled{
+    background:#7368ff;
+    cursor:pointer;
+  }
+  
+  .cg-back-link{
+    background:none;
+    border:none;
+    margin-top:20px;
+    color:#444;
+    font-size:15px;
+    cursor:pointer;
+  }
+  
