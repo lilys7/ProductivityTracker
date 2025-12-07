@@ -6,6 +6,7 @@ import QuestsPage from "./components/QuestPage.jsx"
 import Login from "./components/Login";
 import { Routes, Route } from "react-router-dom";
 import GetStarted from "./components/GetStarted";
+import SelectHabits from "./components/SelectHabits";
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/quests" element={<QuestsPage />} />
       <Route path="/get-started" element={<GetStarted />} />
+      <Route path="/select-habits" element={<SelectHabits />} />
     </Routes>
   );
 }

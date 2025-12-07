@@ -1,0 +1,86 @@
+body {
+    background: linear-gradient(
+        135deg,
+        #5c6cff,
+        #bc84ff,
+        #e6a270
+      );
+}
+.gs-page {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    
+  }
+  
+  /*white card*/
+  .gs-card {
+    background: white;
+    padding: 50px 60px 70px;
+    border-radius: 26px;
+    width: 700px;
+    text-align: center;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.15);
+  }
+  
+  /*progress bar*/
+  .gs-steps {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+  .gs-step {
+    height: 6px;
+    width: 120px;
+    background: #e1e1e9;
+    border-radius: 999px;
+  }
+  .gs-step.active {
+    background: #6c63ff;
+  }
+  
+  .gs-icon {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      #81e0b4,
+      #6a72ff
+    );
+    margin: 0 auto;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    color: white;
+    margin-bottom: 30px;
+  }
+  
+ 
+  .gs-desc {
+    max-width: 520px;
+    margin: 15px auto 35px;
+    color: #6c6c6c;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  /*button*/
+  .gs-btn {
+    background: #7167ff;
+    border: none;
+    color: white;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .gs-btn:hover {
+    background: #6259ff;
+  }
+  

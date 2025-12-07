@@ -1,0 +1,107 @@
+body {
+    background:linear-gradient(135deg,#5c6cff,#bc84ff,#e6a270);
+}
+.habits-page {
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding-top:10px;
+    
+  }
+  
+  
+  .habits-card {
+    background:white;
+    width:700px;
+    padding:40px 100px 65px;
+    border-radius:26px;
+    box-shadow:0 12px 36px rgba(0,0,0,.15);
+  }
+  
+  /* steps */
+  
+  .habits-steps {
+    display:flex;
+    gap:18px;
+    margin-bottom:40px;
+  }
+  .habits-step {
+    height:5px;
+    flex:1;
+    background:#e1e1e9;
+    border-radius:999px;
+  }
+  .habits-step.active {
+    background:#6c63ff;
+  }
+  
+  /* text */
+  
+  .sub {
+    color:#777;
+    margin-bottom:35px;
+  }
+  
+  /* grid */
+  
+  .habits-grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:22px 26px;
+    margin-bottom:40px;
+  }
+  
+  /* card */
+  
+  .habit-box {
+    border:2px solid #deddf6;
+    padding:18px 20px;
+    border-radius:16px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    font-size:17px;
+    cursor:pointer;
+  }
+  
+  .habit-box:hover {
+    background:#f7f7ff;
+  }
+  
+  .selected {
+    background:#edeaff;
+    border-color:#7b6ffc;
+  }
+  
+  .habit-icon {
+    font-size:22px;
+  }
+  
+  .check {
+    margin-left:auto;
+    color:#6c63ff;
+  }
+  
+  /* buttons */
+  
+  .continue-btn {
+    margin-top:10px;
+    width:100%;
+    background:#6c63ff;
+    border:none;
+    color:white;
+    padding:16px 0;
+    border-radius:12px;
+    font-size:17px;
+    cursor:pointer;
+  }
+  
+  .back-btn {
+    background:none;
+    border:none;
+    margin-top:20px;
+    color:#444;
+    font-size:15px;
+    cursor:pointer;
+  }
+  
