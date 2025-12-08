@@ -126,6 +126,19 @@ async def create_quest(quest: QuestRequest):
     data["_id"] = str(result.inserted_id)
     return data
 
+'''
+@app.post("/quests/raw")
+async def raw_body(request: Request):
+    body = await request.json()
+    print("RAW BODY:", body)
+    return {"received": body}
+
+
+@app.post("/quests")
+async def create_quest(quest: QuestRequest):
+    print("REQUEST DATA:", quest)
+    return {"ok": True}'''
+
 
 #fetch quests
 @app.get("/quests/{userId}")
