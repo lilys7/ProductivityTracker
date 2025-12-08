@@ -3,7 +3,22 @@ import "./groupsPage.css";
 
 export default function GroupsPage() {
   const groups = [
-    
+    {
+        title: "Morning Risers",
+        category: "Sleep",
+        members: 5,
+        rank: 2,
+        avgXp: 1250,
+        code: "MR–A3F9"
+      },
+      {
+        title: "Study Squad",
+        category: "Study",
+        members: 8,
+        rank: 5,
+        avgXp: 980,
+        code: "SS–98K1"
+      }
   ];
 
   return (
