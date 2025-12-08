@@ -92,3 +92,15 @@
   font-size: 16px;
   cursor: pointer;
 }
+
+.logout-btn {
+  margin-top: 12px;
+  background: #f4f4f6;
+  color: #2c2c34;
+  padding: 12px 0;
+  width: 100%;
+  border: 1px solid #dcdce7;
+  border-radius: 14px;
+  font-size: 16px;
+  cursor: pointer;
+}

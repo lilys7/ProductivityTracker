@@ -1,5 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import "../profile.css";   // go up one level because file is in /components/
 export default function ProfilePageNEW() {
+  const navigate = useNavigate();
 
   // For now, dummy data. Later we connect it to backend.
   const user = {
@@ -42,6 +44,17 @@ export default function ProfilePageNEW() {
 
         <button className="edit-btn">
           Edit Profile
+        </button>
+
+        <button
+          className="logout-btn"
+          onClick={() => {
+            localStorage.removeItem("duelhabit:user");
+            localStorage.removeItem("duelhabit:onboardingComplete");
+            navigate("/");
+          }}
+        >
+          Log out
         </button>
       </div>
     </div>
