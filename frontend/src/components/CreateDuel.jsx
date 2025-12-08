@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./createDuel.css";
 
@@ -19,35 +19,47 @@ const DURATIONS = [
   { id: "7d", label: "7 days" },
 ];
 
-const GROUPS = [
-  {
-    id: "g1",
-    name: "Room 412 Grind Squad",
-    members: [
-      { id: "sarah", name: "Sarah_K", level: 15, emoji: "👩‍🦱" },
-      { id: "mike", name: "Mike_T", level: 12, emoji: "👨‍🦱" },
-    ],
-  },
-  {
-    id: "g2",
-    name: "CS Freshman Focus",
-    members: [
-      { id: "alex", name: "Alex_R", level: 18, emoji: "🧑‍💻" },
-      { id: "mark", name: "Mark_S", level: 9, emoji: "🧑‍🎓" },
-    ],
-  },
-];
-
-
 export default function CreateDuel() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [selectedHabit, setSelectedHabit] = useState(HABITS[0].id);
   const [targetHours, setTargetHours] = useState(8);
   const [duration, setDuration] = useState(DURATIONS[0].id);
-  const [groupId, setGroupId] = useState(GROUPS[0].id);
-  const [opponentId, setOpponentId] = useState(GROUPS[0].members[0].id);
+  const [groupId, setGroupId] = useState(localStorage.getItem("groupId") || "");
+  const [groupName, setGroupName] = useState(localStorage.getItem("groupName") || "");
+  const [groupMembers, setGroupMembers] = useState([]);
+  const [opponentId, setOpponentId] = useState("");
   const [loading, setLoading] = useState(false);
+  const [memberError, setMemberError] = useState("");
+
+  // load group members from backend
+  useEffect(() => {
+    const gid = localStorage.getItem("groupId");
+    if (!gid) {
+      setMemberError("Join or create a group before starting a duel.");
+      return;
+    }
+    setGroupId(gid);
+    setGroupName(localStorage.getItem("groupName") || "");
+    const fetchMembers = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/groups/${gid}/members`);
+        if (!res.ok) throw new Error("Failed to load group members");
+        const data = await res.json();
+        const me = localStorage.getItem("userId");
+        const filtered = (data.members || []).filter((m) => m.id !== me);
+        setGroupMembers(filtered);
+        setOpponentId(filtered?.[0]?.id || "");
+        if (filtered.length === 0) {
+          setMemberError("No other members in your group yet.");
+        }
+      } catch (e) {
+        console.error(e);
+        setMemberError("Unable to load group members.");
+      }
+    };
+    fetchMembers();
+  }, []);
 
   const goBack = () => {
     if (step > 1) {
@@ -71,12 +83,17 @@ export default function CreateDuel() {
       alert("You must be logged in to create a duel.");
       return;
     }
+    if (!groupId) {
+      alert("You need to be in a group to create a duel.");
+      return;
+    }
+    if (!opponentId) {
+      alert("Select an opponent from your group.");
+      return;
+    }
 
-    // find opponent name from the selected group
-    const activeGroup = GROUPS.find((g) => g.id === groupId) ?? GROUPS[0];
-    const friend =
-      activeGroup.members.find((m) => m.id === opponentId) ??
-      activeGroup.members[0];
+    // find opponent name from fetched members
+    const friend = groupMembers.find((m) => m.id === opponentId);
 
     const payload = {
       userId,
@@ -85,7 +102,7 @@ export default function CreateDuel() {
       duration,
       groupId,
       opponentId,
-      opponentName: friend?.name || "Friend",
+      opponentName: friend?.email || "Friend",
     };
 
     try {
@@ -144,13 +161,15 @@ export default function CreateDuel() {
       )}
 
       {step === 4 && (
-      <StepOpponent
-        groupId={groupId}
-        opponentId={opponentId}
-        onChangeGroup={setGroupId}
-        onChangeOpponent={setOpponentId}
-      />
-    )}
+        <StepOpponent
+          groupId={groupId}
+          groupName={groupName}
+          opponentId={opponentId}
+          onChangeOpponent={setOpponentId}
+          members={groupMembers}
+          error={memberError}
+        />
+      )}
 
       <button
         className="create-primary"
@@ -274,54 +293,30 @@ function StepDuration({ duration, onChangeDuration }) {
   );
 }
 
-function StepOpponent({
-  groupId,
-  opponentId,
-  onChangeGroup,
-  onChangeOpponent,
-}) {
-  const groups = GROUPS;
-  const activeGroup =
-    groups.find((g) => g.id === groupId) ?? groups[0];
-
-  const members = activeGroup.members;
-
+function StepOpponent({ groupId, groupName, opponentId, onChangeOpponent, members, error }) {
   return (
     <section className="create-section">
       <h2 className="create-section-title">Choose Opponent</h2>
       <p className="create-section-sub">
-        Pick a group and then select who you want to challenge.
+        Only members of your group can be challenged.
       </p>
 
-      {/* group tabs */}
-      <div className="opponent-group-tabs">
-        {groups.map((g) => (
-          <button
-            key={g.id}
-            className={
-              "opponent-group-pill " +
-              (g.id === activeGroup.id
-                ? "opponent-group-pill-active"
-                : "")
-            }
-            onClick={() => {
-              onChangeGroup(g.id);
-              onChangeOpponent(g.members[0]?.id);
-            }}
-          >
-            {g.name}
-          </button>
-        ))}
-      </div>
+      {groupId && (
+        <div className="goal-summary">
+          Group: <strong>{groupName || groupId}</strong>
+        </div>
+      )}
 
-      <input
-        type="text"
-        className="opponent-search"
-        placeholder="Search friends (visual only)..."
-        readOnly
-      />
+      {!groupId && (
+        <div className="goal-summary">Join or create a group first.</div>
+      )}
+
+      {error && <div className="goal-summary">{error}</div>}
 
       <div className="opponent-list">
+        {members.length === 0 && (
+          <div className="goal-summary">No members found in your group.</div>
+        )}
         {members.map((friend) => {
           const selected = friend.id === opponentId;
           return (
@@ -334,11 +329,11 @@ function StepOpponent({
               onClick={() => onChangeOpponent(friend.id)}
             >
               <div className="opponent-left">
-                <div className="opponent-avatar">{friend.emoji}</div>
+                <div className="opponent-avatar">👤</div>
                 <div>
-                  <div className="opponent-name">{friend.name}</div>
+                  <div className="opponent-name">{friend.email}</div>
                   <div className="opponent-level">
-                    Level {friend.level}
+                    Group member
                   </div>
                 </div>
               </div>

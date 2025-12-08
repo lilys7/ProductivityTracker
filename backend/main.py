@@ -3,6 +3,7 @@ import random
 import string
 from fastapi import FastAPI, HTTPException
 import uvicorn
+from bson import ObjectId
 from pydantic import BaseModel, EmailStr
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
@@ -163,6 +164,15 @@ async def create_group(payload: GroupCreateRequest):
         "created_at": datetime.utcnow().isoformat(),
     }
     result = await db.groups.insert_one(doc)
+    # also record membership on the user document
+    try:
+        await db.users.update_one(
+            {"_id": ObjectId(payload.userId)},
+            {"$addToSet": {"groups": str(result.inserted_id)}},
+        )
+    except Exception:
+        # ignore silently if userId is not a valid ObjectId; group still created
+        pass
     return {
         "id": str(result.inserted_id),
         "name": doc["name"],
@@ -185,6 +195,13 @@ async def join_group(payload: GroupJoinRequest):
         {"_id": group["_id"]},
         {"$addToSet": {"members": payload.userId}},
     )
+    try:
+        await db.users.update_one(
+            {"_id": ObjectId(payload.userId)},
+            {"$addToSet": {"groups": str(group["_id"])}},
+        )
+    except Exception:
+        pass
 
     # return updated group info
     updated = await db.groups.find_one({"_id": group["_id"]})
@@ -212,6 +229,36 @@ async def list_groups(userId: str):
             "members": g.get("members", []),
         })
     return resp
+
+
+@app.get("/groups/{groupId}/members")
+async def list_group_members(groupId: str):
+    """Return member info (id + email) for a group."""
+    db = get_db()
+    try:
+        group = await db.groups.find_one({"_id": ObjectId(groupId)})
+    except Exception:
+        group = None
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found.")
+
+    member_ids_raw = group.get("members", [])
+    object_ids = []
+    for mid in member_ids_raw:
+        try:
+            object_ids.append(ObjectId(mid))
+        except Exception:
+            continue
+
+    members = []
+    if object_ids:
+        users = await db.users.find({"_id": {"$in": object_ids}}).to_list(len(object_ids))
+        for u in users:
+            members.append({
+                "id": str(u["_id"]),
+                "email": u.get("email"),
+            })
+    return {"groupId": groupId, "members": members}
 
 
 #user auth and login endpoint
@@ -251,6 +298,18 @@ async def create_duel(duel: DuelCreateRequest):
     #create new duel, store at pending with no progress
     db = get_db()
     data = duel.dict()
+
+    # If a group is provided, ensure opponent is in that group
+    if data.get("groupId"):
+        try:
+            group = await db.groups.find_one({"_id": ObjectId(data["groupId"])})
+        except Exception:
+            group = None
+        if not group:
+            raise HTTPException(status_code=404, detail="Group not found.")
+        members = group.get("members", [])
+        if data.get("opponentId") not in members:
+            raise HTTPException(status_code=400, detail="Opponent must be in the group.")
 
     # basic fields
     # Example XP formula: 250 base + 10 * targetHours
