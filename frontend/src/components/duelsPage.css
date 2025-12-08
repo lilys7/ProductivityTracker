@@ -1,0 +1,143 @@
+.duels-page {
+  max-width: 480px;
+  margin: 32px auto 40px;
+  padding: 0 16px 32px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+.duels-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.duels-title {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+
+.duels-subtitle {
+  color: #7b7b93;
+  font-size: 14px;
+}
+
+.duels-section {
+  margin-bottom: 24px;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #8a8ab5;
+  margin-bottom: 8px;
+}
+
+.duel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.duel-card {
+  width: 100%;
+  border: none;
+  text-align: left;
+  background: white;
+  border-radius: 18px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+}
+
+.duel-card-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.duel-card-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.duel-card-meta {
+  font-size: 12px;
+  color: #9090b0;
+}
+
+.status-pill {
+  font-size: 11px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.status-active {
+  background: #e7f1ff;
+  color: #3366ff;
+  border-color: #c2d3ff;
+}
+
+.status-pending {
+  background: #fff7e6;
+  color: #e69b24;
+  border-color: #ffe1a3;
+}
+
+.status-completed {
+  background: #e6ffe9;
+  color: #2ca55e;
+  border-color: #b4f0c5;
+}
+
+.progress-row {
+  margin-top: 4px;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #7b7b93;
+  margin-bottom: 4px;
+}
+
+.progress-track {
+  height: 6px;
+  background: #ecebff;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.progress-self {
+  background: linear-gradient(90deg, #7b61ff, #a45dff);
+}
+
+.progress-opponent {
+  background: #ffb36b;
+}
+
+.empty-text {
+  font-size: 13px;
+  color: #9a9ab5;
+}
+
+.primary-btn {
+  background: linear-gradient(90deg, #7b61ff, #a45dff);
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
