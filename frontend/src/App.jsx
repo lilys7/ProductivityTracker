@@ -12,9 +12,10 @@ import CreateGroup from "./components/CreateGroup";
 import JoinGroup from "./components/JoinGroup";
 import HomePage from "./components/HomePage";
 import DuelsPage from "./components/DuelsPage";
-import ProfilePage from "./components/ProfilePage";
+import ProfilePageNEW from "./components/ProfilePage";
 import GroupsPage from "./components/GroupsPage";
 import RanksPage from "./components/RanksPage";
+import AddQuest from "./components/AddQuests";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -23,8 +24,9 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/home" element={<HomePage />} />
       <Route path="/quests" element={<QuestsPage />} />
+      <Route path="/add-quests" element={<AddQuest />} />
       <Route path="/duels" element={<DuelsPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/profile" element={<ProfilePageNEW />} />
       <Route path="/groups" element={<GroupsPage />} />
       <Route path="/ranks" element={<RanksPage />} />
       <Route path="/get-started" element={<GetStarted />} />
@@ -32,6 +34,7 @@ function App() {
       <Route path="/join-friends" element={<JoinFriends />} />
       <Route path="/create-group" element={<CreateGroup />} />
       <Route path="/join-group" element={<JoinGroup />} />
+      
     </Routes>
   );
 }
