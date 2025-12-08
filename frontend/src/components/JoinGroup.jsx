@@ -13,7 +13,8 @@ export default function JoinGroup() {
     if (!validCode) return;
 
     // TODO: validate with backend
-    navigate("/group-joined");
+    localStorage.setItem("duelhabit:onboardingComplete", "true");
+    navigate("/home");
   };
 
   return (

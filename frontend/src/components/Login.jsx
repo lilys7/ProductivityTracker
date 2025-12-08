@@ -16,10 +16,12 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await api.post("/auth/login", {
+      const { data } = await api.post("/auth/login", {
         email,
         password: pw,
       });
+      localStorage.setItem("duelhabit:user", JSON.stringify(data));
+      localStorage.setItem("duelhabit:onboardingComplete", "false");
       navigate("/get-started");
     } catch (err) {
       setError("Unable to login right now. Please try again.");

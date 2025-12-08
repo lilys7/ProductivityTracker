@@ -12,6 +12,7 @@ export default function CreateGroup() {
     if (!canContinue) return;
 
     // to do: call backend
+    localStorage.setItem("duelhabit:onboardingComplete", "true");
     navigate("/home");
   };
 
