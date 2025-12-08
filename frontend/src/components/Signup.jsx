@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Login.css";       //reuse same styles
+import "./login.css";       //reuse same styles
 import api from "./api";
 
 export default function Signup() {

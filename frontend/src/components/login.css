@@ -4,12 +4,6 @@
     justify-content: center;
     align-items: center;
   
-    background: linear-gradient(
-      135deg,
-      #5c6cff,
-      #bc84ff,
-      #e6a270
-    );
   }
   
   .login-card {
