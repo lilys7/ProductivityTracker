@@ -71,5 +71,36 @@ async def login(payload: LoginRequest):
     }
 
 
+@app.post("/auth/login")
+async def login(payload: LoginRequest):
+    """
+    Login existing user.
+    - If user does NOT exist -> 404
+    - If password is wrong -> 401
+    - Otherwise, return user info
+    """
+    db = get_db()
+
+    existing = await db.users.find_one({"email": payload.email})
+    if not existing:
+        raise HTTPException(
+            status_code=404,
+            detail="No account found with that email.",
+        )
+
+    hashed = hash_password(payload.password)
+    if existing.get("password") != hashed:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect password.",
+        )
+
+    return {
+        "id": str(existing["_id"]),
+        "email": existing["email"],
+        "created_at": existing.get("created_at"),
+    }
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
