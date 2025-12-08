@@ -1,8 +1,9 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables from a local .env file if present
-load_dotenv()
+# Load environment variables from a local .env file if present, even when run from repo root
+load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env")
 
 # Mongo connection settings, accepting multiple common env var names so local/hosted URIs both work.
 MONGO_URL = (
