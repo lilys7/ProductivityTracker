@@ -1,0 +1,56 @@
+/* RankingPage.css */
+.ranking-container {
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+background: #f1f1f1;
+}
+
+
+.ranking-card {
+background: #ffffff;
+padding: 32px;
+width: 350px;
+border-radius: 25px;
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+text-align: center;
+}
+
+
+.ranking-title {
+margin-bottom: 20px;
+font-size: 24px;
+font-weight: bold;
+}
+
+
+.ranking-list {
+list-style: none;
+padding: 0;
+margin: 0;
+}
+
+
+.ranking-item {
+display: flex;
+justify-content: space-between;
+padding: 12px 0;
+border-bottom: 1px solid #e6e6e6;
+}
+
+
+.ranking-item:last-child {
+border-bottom: none;
+}
+
+
+.ranking-name {
+font-size: 18px;
+}
+
+
+.ranking-score {
+font-size: 18px;
+font-weight: bold;
+}
