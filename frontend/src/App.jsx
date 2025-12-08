@@ -15,6 +15,7 @@ import DuelsPage from "./components/DuelsPage";
 import ProfilePageNEW from "./components/ProfilePage";
 import GroupsPage from "./components/GroupsPage";
 import RanksPage from "./components/RanksPage";
+import AddQuest from "./components/AddQuests";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -23,6 +24,7 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/home" element={<HomePage />} />
       <Route path="/quests" element={<QuestsPage />} />
+      <Route path="/add-quests" element={<AddQuest />} />
       <Route path="/duels" element={<DuelsPage />} />
       <Route path="/profile" element={<ProfilePageNEW />} />
       <Route path="/groups" element={<GroupsPage />} />
