@@ -10,7 +10,11 @@ async def connect_db():
   """Initialize the Mongo client once on app startup."""
   global client, db
   if client is None:
-    client = AsyncIOMotorClient(MONGO_URL)
+    client = AsyncIOMotorClient(
+            MONGO_URL,
+            tls=True,
+            tlsAllowInvalidCertificates=True
+        )
     db = client[MONGO_DB]
 
 

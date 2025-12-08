@@ -4,9 +4,11 @@ import uvicorn
 from pydantic import BaseModel, EmailStr
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
+from dotenv import load_dotenv
+
 
 from database import connect_db, close_db, get_db
-
+load_dotenv()
 app = FastAPI()
 
 origins = [

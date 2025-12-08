@@ -12,19 +12,25 @@ export default function Login() {
   const navigate = useNavigate();
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      await api.post("/auth/login", {
+  
+    const res = await fetch("http://localhost:8000/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         email,
         password: pw,
-      });
+      }),
+    });
+  
+    const data = await res.json();
+  
+    if (data.message === "ok") {
+      // Success!
+      // Optionally save userId locally
+      localStorage.setItem("userId", data.user);
       navigate("/get-started");
-    } catch (err) {
-      setError("Unable to login right now. Please try again.");
-    } finally {
-      setLoading(false);
+    } else {
+      alert("Invalid login");
     }
   };
 

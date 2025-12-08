@@ -32,6 +32,7 @@ function App() {
       <Route path="/join-friends" element={<JoinFriends />} />
       <Route path="/create-group" element={<CreateGroup />} />
       <Route path="/join-group" element={<JoinGroup />} />
+      
     </Routes>
   );
 }
