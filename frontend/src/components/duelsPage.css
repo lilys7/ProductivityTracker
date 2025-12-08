@@ -1,143 +1,249 @@
-.duels-page {
-  max-width: 480px;
+.duelhub-page {
+  max-width: 900px;
   margin: 32px auto 40px;
-  padding: 0 16px 32px;
+  padding: 0 24px 80px;
+  background: #f5f5fb;
+  min-height: 100vh;
+  position: relative;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
 }
 
-.duels-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+.duelhub-header {
+  margin-bottom: 20px;
 }
 
-.duels-title {
+.duelhub-title {
   font-size: 28px;
   margin-bottom: 4px;
 }
 
-.duels-subtitle {
+.duelhub-subtitle {
   color: #7b7b93;
   font-size: 14px;
 }
 
-.duels-section {
-  margin-bottom: 24px;
-}
-
-.section-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #8a8ab5;
-  margin-bottom: 8px;
-}
-
-.duel-list {
+.duelhub-tabs {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  background: white;
+  border-radius: 999px;
+  padding: 4px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+  margin-bottom: 20px;
+  max-width: 520px;
 }
 
-.duel-card {
-  width: 100%;
+.duelhub-tab-btn {
+  flex: 1;
   border: none;
-  text-align: left;
-  background: white;
-  border-radius: 18px;
-  padding: 14px 16px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+  background: transparent;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  color: #777;
   cursor: pointer;
 }
 
-.duel-card-main {
+.duelhub-tab-active {
+  background: #5c5cff;
+  color: white;
+}
+
+.duelhub-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.duelhub-empty {
+  color: #9a9ab5;
+  font-size: 14px;
+}
+
+/* Cards */
+
+.duel-card {
+  background: white;
+  border-radius: 24px;
+  padding: 18px 20px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
+  border: 1px solid transparent;
+}
+
+.duel-card-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
-.duel-card-title {
+.duel-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.duel-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  background: #f0ecff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.duel-icon-pending {
+  background: #fff4dd;
+}
+
+.duel-title {
   font-weight: 600;
   margin-bottom: 2px;
 }
 
-.duel-card-meta {
+.duel-subline {
+  font-size: 13px;
+  color: #7b7b93;
+}
+
+.duel-card-right {
+  text-align: right;
+  font-size: 13px;
+}
+
+.duel-time {
+  color: #7b7b93;
+  margin-bottom: 2px;
+}
+
+.duel-xp {
+  color: #ff9b3d;
+  font-weight: 600;
+}
+
+/* Progress bars */
+
+.duel-progress-label {
   font-size: 12px;
-  color: #9090b0;
-}
-
-.status-pill {
-  font-size: 11px;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-}
-
-.status-active {
-  background: #e7f1ff;
-  color: #3366ff;
-  border-color: #c2d3ff;
-}
-
-.status-pending {
-  background: #fff7e6;
-  color: #e69b24;
-  border-color: #ffe1a3;
-}
-
-.status-completed {
-  background: #e6ffe9;
-  color: #2ca55e;
-  border-color: #b4f0c5;
-}
-
-.progress-row {
-  margin-top: 4px;
-}
-
-.progress-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
   color: #7b7b93;
   margin-bottom: 4px;
 }
 
-.progress-track {
-  height: 6px;
-  background: #ecebff;
+.duel-progress-bar {
+  height: 8px;
   border-radius: 999px;
+  background: #ecebff;
   overflow: hidden;
+  margin-bottom: 8px;
 }
 
-.progress-fill {
+.duel-progress-inner {
   height: 100%;
   border-radius: inherit;
 }
 
-.progress-self {
-  background: linear-gradient(90deg, #7b61ff, #a45dff);
+.duel-progress-green {
+  background: #4ecb71;
 }
 
-.progress-opponent {
-  background: #ffb36b;
+.duel-progress-red {
+  background: #ff6b6b;
 }
 
-.empty-text {
+/* Pending card */
+
+.duel-card-pending {
+  background: #fffaf0;
+  border-color: #ffe1a3;
+}
+
+.duel-pending-banner {
+  margin-top: 10px;
+  background: #ffeccc;
+  border-radius: 14px;
+  padding: 10px 12px;
+  text-align: center;
   font-size: 13px;
-  color: #9a9ab5;
+  color: #a57620;
 }
 
-.primary-btn {
-  background: linear-gradient(90deg, #7b61ff, #a45dff);
-  border: none;
-  color: white;
+/* Completed cards */
+
+.duel-card-completed {
+  border-width: 2px;
+}
+
+.duel-card-win {
+  border-color: #7ddf9b;
+}
+
+.duel-card-loss {
+  border-color: #ff9b9b;
+}
+
+.duel-card-result {
+  font-size: 13px;
+}
+
+.result-text-win {
+  color: #34a853;
   font-weight: 600;
+}
+
+.result-text-loss {
+  color: #ea4335;
+  font-weight: 600;
+}
+
+.duel-versus-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+
+.duel-versus-label {
+  font-size: 13px;
+  color: #7b7b93;
+}
+
+.duel-versus-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.duel-versus-middle {
+  font-size: 13px;
+  color: #a0a0b5;
+  align-self: center;
+}
+
+.duel-xp-earned {
+  text-align: center;
   font-size: 14px;
-  padding: 10px 16px;
+  margin-top: 6px;
+  color: #34a853;
+}
+
+/* Floating button allowing duel creation*/
+
+.duelhub-fab {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  width: 56px;
+  height: 56px;
   border-radius: 999px;
+  border: none;
+  background: #635bff;
+  color: white;
+  font-size: 32px;
+  line-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
   cursor: pointer;
 }
