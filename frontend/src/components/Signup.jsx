@@ -22,6 +22,8 @@ export default function Signup() {
       });
 
       // Save user + mark onboarding not complete yet
+      localStorage.setItem("userId", data.id);
+      localStorage.setItem("email", data.email);
       localStorage.setItem("duelhabit:user", JSON.stringify(data));
       localStorage.setItem("duelhabit:onboardingComplete", "false");
 

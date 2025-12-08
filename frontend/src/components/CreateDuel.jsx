@@ -40,7 +40,30 @@ const GROUPS = [
 
 
 export default function CreateDuel() {
-  // ...existing state...
+  const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const [selectedHabit, setSelectedHabit] = useState(HABITS[0].id);
+  const [targetHours, setTargetHours] = useState(8);
+  const [duration, setDuration] = useState(DURATIONS[0].id);
+  const [groupId, setGroupId] = useState(GROUPS[0].id);
+  const [opponentId, setOpponentId] = useState(GROUPS[0].members[0].id);
+  const [loading, setLoading] = useState(false);
+
+  const goBack = () => {
+    if (step > 1) {
+      setStep((s) => s - 1);
+    } else {
+      navigate("/duels");
+    }
+  };
+
+  const handleContinue = async () => {
+    if (step < 4) {
+      setStep((s) => s + 1);
+      return;
+    }
+    await handleCreate();
+  };
 
   const handleCreate = async () => {
     const userId = localStorage.getItem("userId");
@@ -66,6 +89,7 @@ export default function CreateDuel() {
     };
 
     try {
+      setLoading(true);
       const res = await fetch(`${API_BASE}/duels`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -81,6 +105,8 @@ export default function CreateDuel() {
     } catch (e) {
       console.error(e);
       alert(e.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -118,16 +144,20 @@ export default function CreateDuel() {
       )}
 
       {step === 4 && (
-        <StepOpponent
-          groupId={groupId}
-          opponentId={opponentId}
-          onChangeGroup={setGroupId}
-          onChangeOpponent={setOpponentId}
-        />
-      )}
+      <StepOpponent
+        groupId={groupId}
+        opponentId={opponentId}
+        onChangeGroup={setGroupId}
+        onChangeOpponent={setOpponentId}
+      />
+    )}
 
-      <button className="create-primary" onClick={handleContinue}>
-        {step < 4 ? "Continue" : "Create Duel"}
+      <button
+        className="create-primary"
+        onClick={handleContinue}
+        disabled={loading}
+      >
+        {step < 4 ? "Continue" : loading ? "Creating..." : "Create Duel"}
       </button>
     </div>
   );
@@ -191,7 +221,9 @@ function StepGoal({ habitId, targetHours, onChangeTarget }) {
           <div className="habit-icon">{habit?.icon}</div>
           <div>
             <div className="goal-habit-label">{habit?.label}</div>
-            <div className="goal-habit-sub">Sleep ≥ X hours</div>
+            <div className="goal-habit-sub">
+              {habit?.label || "Habit"} ≥ X hours
+            </div>
           </div>
         </div>
 
@@ -320,4 +352,3 @@ function StepOpponent({
     </section>
   );
 }
-

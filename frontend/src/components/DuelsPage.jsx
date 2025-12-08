@@ -3,20 +3,43 @@ import { useNavigate } from "react-router-dom";
 import "./duelsPage.css";
 
 const API_BASE = "http://localhost:8000";
+const HABIT_ICONS = {
+  sleep: "🌙",
+  hydration: "💧",
+  study: "📚",
+  screen: "📵",
+  exercise: "💪",
+};
 
 export default function DuelsPage() {
-  const [tab, setTab] = useState("active");
+  const [tab, setTab] = useState("pending");
   const [duels, setDuels] = useState([]);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     async function loadDuels() {
-      const userId = localStorage.getItem("userId");
+      const storedUser = localStorage.getItem("duelhabit:user");
+      let parsedUser = null;
+
+      if (storedUser) {
+        try {
+          parsedUser = JSON.parse(storedUser);
+        } catch {
+          parsedUser = null;
+        }
+      }
+      const userId = localStorage.getItem("userId") || parsedUser?.id;
+
+      if (userId && !localStorage.getItem("userId")) {
+        localStorage.setItem("userId", userId);
+      }
+
       if (!userId) {
         setError("You must be logged in to view duels.");
         return;
       }
+
       try {
         const res = await fetch(`${API_BASE}/duels/${userId}`);
         if (!res.ok) throw new Error("Failed to load duels");
@@ -50,7 +73,32 @@ export default function DuelsPage() {
         </header>
 
         <div className="duelhub-tabs">
-          {/* same tab buttons as before */}
+          <button
+            className={
+              "duelhub-tab-btn " + (tab === "active" ? "duelhub-tab-active" : "")
+            }
+            onClick={() => setTab("active")}
+          >
+            Active
+          </button>
+          <button
+            className={
+              "duelhub-tab-btn " +
+              (tab === "pending" ? "duelhub-tab-active" : "")
+            }
+            onClick={() => setTab("pending")}
+          >
+            Pending
+          </button>
+          <button
+            className={
+              "duelhub-tab-btn " +
+              (tab === "completed" ? "duelhub-tab-active" : "")
+            }
+            onClick={() => setTab("completed")}
+          >
+            Completed
+          </button>
         </div>
 
         {error && <p className="duelhub-empty">{error}</p>}
@@ -84,6 +132,114 @@ export default function DuelsPage() {
       >
         +
       </button>
+    </div>
+  );
+}
+
+function ActiveDuelCard({ duel }) {
+  const icon = HABIT_ICONS[duel.habit?.toLowerCase()] || "⚔️";
+  return (
+    <div className="duel-card">
+      <div className="duel-card-top">
+        <div className="duel-card-left">
+          <div className="duel-icon-circle">{icon}</div>
+          <div>
+            <div className="duel-title">{duel.title}</div>
+            <div className="duel-subline">vs {duel.opponent}</div>
+          </div>
+        </div>
+        <div className="duel-card-right">
+          <div className="duel-time">{duel.timeLeft}</div>
+          <div className="duel-xp">{duel.xp} XP</div>
+        </div>
+      </div>
+
+      <div className="duel-progress-label">Your progress</div>
+      <div className="duel-progress-bar">
+        <div
+          className="duel-progress-inner duel-progress-green"
+          style={{ width: `${duel.youPct ?? 0}%` }}
+        />
+      </div>
+
+      <div className="duel-progress-label">Opponent progress</div>
+      <div className="duel-progress-bar">
+        <div
+          className="duel-progress-inner duel-progress-red"
+          style={{ width: `${duel.oppPct ?? 0}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function PendingDuelCard({ duel }) {
+  const icon = HABIT_ICONS[duel.habit?.toLowerCase()] || "⌛";
+  return (
+    <div className="duel-card duel-card-pending">
+      <div className="duel-card-top">
+        <div className="duel-card-left">
+          <div className="duel-icon-circle duel-icon-pending">{icon}</div>
+          <div>
+            <div className="duel-title">{duel.title}</div>
+            <div className="duel-subline">Waiting for {duel.opponent}</div>
+          </div>
+        </div>
+        <div className="duel-card-right">
+          <div className="duel-time">{duel.timeLeft}</div>
+          <div className="duel-xp">{duel.xp} XP</div>
+        </div>
+      </div>
+
+      <div className="duel-pending-banner">
+        Pending acceptance. You&apos;ll be notified when it starts.
+      </div>
+    </div>
+  );
+}
+
+function CompletedDuelCard({ duel }) {
+  const icon = HABIT_ICONS[duel.habit?.toLowerCase()] || "🏁";
+  const won = duel.result === "won";
+
+  return (
+    <div
+      className={
+        "duel-card duel-card-completed " + (won ? "duel-card-win" : "duel-card-loss")
+      }
+    >
+      <div className="duel-card-top">
+        <div className="duel-card-left">
+          <div className="duel-icon-circle">{icon}</div>
+          <div>
+            <div className="duel-title">{duel.title}</div>
+            <div className="duel-subline">vs {duel.opponent}</div>
+          </div>
+        </div>
+        <div className="duel-card-right">
+          <div className="duel-time">{duel.timeLeft}</div>
+          <div className="duel-xp">{duel.xp} XP</div>
+        </div>
+      </div>
+
+      <div className="duel-versus-row">
+        <div>
+          <div className="duel-versus-label">You</div>
+          <div className="duel-versus-value">{duel.youPct}%</div>
+        </div>
+        <div className="duel-versus-middle">vs</div>
+        <div>
+          <div className="duel-versus-label">{duel.opponent}</div>
+          <div className="duel-versus-value">{duel.oppPct}%</div>
+        </div>
+      </div>
+
+      <div className="duel-card-result">
+        Result:{" "}
+        <span className={won ? "result-text-win" : "result-text-loss"}>
+          {won ? "You won!" : "You lost"}
+        </span>
+      </div>
     </div>
   );
 }
