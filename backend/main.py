@@ -170,12 +170,25 @@ async def complete_quest(questId: str):
     )
 
     # increment user xp
+    updated_user = None
     await db.users.update_one(
         {"_id": ObjectId(quest["userId"])},
         {"$inc": {"xp": quest["xp"]}}
     )
+    try:
+        updated_user = await db.users.find_one({"_id": ObjectId(quest["userId"])})
+    except Exception:
+        updated_user = None
 
-    return {"ok": True}
+    return {
+        "ok": True,
+        "questId": questId,
+        "user": {
+            "id": str(updated_user["_id"]),
+            "email": updated_user.get("email"),
+            "xp": updated_user.get("xp", 0),
+        } if updated_user else None,
+    }
 
 
 

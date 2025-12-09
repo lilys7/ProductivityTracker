@@ -104,9 +104,10 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [quests, setQuests] = useState(fallbackQuests);
   const [duels, setDuels] = useState(fallbackDuels);
-  const user = useMemo(readStoredUser, []);
+  const [userSnapshot, setUserSnapshot] = useState(() => readStoredUser());
+  const user = useMemo(() => userSnapshot, [userSnapshot]);
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    const userId = userSnapshot?.id || localStorage.getItem("userId");
     if (!userId) return;
 
     const loadData = async () => {
@@ -114,9 +115,7 @@ export default function HomePage() {
         const questRes = await fetch(`${API_BASE}/quests/${userId}`);
         if (questRes.ok) {
           const questData = await questRes.json();
-          if (Array.isArray(questData) && questData.length) {
-            setQuests(questData);
-          }
+          setQuests(Array.isArray(questData) ? questData : []);
         }
       } catch (err) {
         console.error("Could not load quests", err);
@@ -126,9 +125,7 @@ export default function HomePage() {
         const duelRes = await fetch(`${API_BASE}/duels/${userId}`);
         if (duelRes.ok) {
           const duelData = await duelRes.json();
-          if (Array.isArray(duelData) && duelData.length) {
-            setDuels(duelData);
-          }
+          setDuels(Array.isArray(duelData) ? duelData : []);
         }
       } catch (err) {
         console.error("Could not load duels", err);
@@ -136,7 +133,16 @@ export default function HomePage() {
     };
 
     loadData();
-  }, []);
+
+    // refresh when the tab becomes visible (e.g., new day/login)
+    const handleVisible = () => {
+      if (document.visibilityState === "visible") {
+        loadData();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisible);
+    return () => document.removeEventListener("visibilitychange", handleVisible);
+  }, [userSnapshot?.id]);
 
   const openQuests = quests.filter((q) => !q.completed);
   const completedQuests = quests.length - openQuests.length;
@@ -151,14 +157,63 @@ export default function HomePage() {
   const displayName = user?.username || user?.name || user?.email || "@habitmaster";
   const streakDays = Number(localStorage.getItem("streakDays")) || rankSnapshot.streak;
   
-  const handleQuestComplete = (questId) => {
-    setQuests(prev =>
-      prev.map(q =>
-        q.id === questId
-          ? { ...q, completed: true, progressText: "Done for today" }
-          : q
-      )
-    );
+  const applyUserUpdate = (latest) => {
+    if (!latest) return;
+    const merged = { ...(userSnapshot || {}), ...latest };
+    localStorage.setItem("duelhabit:user", JSON.stringify(merged));
+    setUserSnapshot(merged);
+    window.dispatchEvent(new CustomEvent("duelhabit:user-updated", { detail: merged }));
+  };
+
+  const refreshUser = async (userId) => {
+    try {
+      const res = await fetch(`${API_BASE}/users/${userId}`);
+      if (res.ok) {
+        const data = await res.json();
+        applyUserUpdate(data);
+      }
+    } catch (err) {
+      console.error("Could not refresh user stats", err);
+    }
+  };
+
+  const refreshQuests = async (userId) => {
+    try {
+      const questRes = await fetch(`${API_BASE}/quests/${userId}`);
+      if (questRes.ok) {
+        const questData = await questRes.json();
+        setQuests(Array.isArray(questData) && questData.length ? questData : []);
+      }
+    } catch (err) {
+      console.error("Could not refresh quests", err);
+    }
+  };
+
+  const handleQuestComplete = async (questId) => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("You must be logged in to complete quests.");
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/quests/complete/${questId}`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || "Failed to complete quest");
+      }
+      const data = await res.json();
+      await refreshQuests(userId);
+      if (data?.user) {
+        applyUserUpdate(data.user);
+      } else {
+        await refreshUser(userId);
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
   };
 
   return (
@@ -238,7 +293,7 @@ export default function HomePage() {
                 <p className="home-empty">You are all caught up for today.</p>
               )}
               {spotlightQuests.map((quest) => (
-                <div key={quest.id} className="home-card-row">
+                <div key={quest.id || quest._id || quest.title} className="home-card-row">
                   <div>
                     <p className="row-title">{quest.title}</p>
                     <p className="row-sub">{quest.progressText}</p>
@@ -253,7 +308,7 @@ export default function HomePage() {
                     <span className="row-xp">+{quest.xp} XP</span>
                     <button
                       className="home-mini-btn"
-                      onClick={() => handleQuestComplete(quest.id)}
+                      onClick={() => handleQuestComplete(quest.id || quest._id)}
                     >
                       Mark done
                     </button>
@@ -430,4 +485,3 @@ export default function HomePage() {
     </div>
   );
 }
-

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import "./quests.css";
 import { useNavigate } from "react-router-dom";
+import "./quests.css";
 
+const API_BASE = "http://localhost:8000";
 
 const initialQuests = [
   {
@@ -50,7 +51,7 @@ export default function QuestsPage() {
       const userId = localStorage.getItem("userId");
       if (!userId) return;
 
-      const res = await fetch(`http://localhost:8000/quests/${userId}`);
+      const res = await fetch(`${API_BASE}/quests/${userId}`);
       const data = await res.json();
       setQuests(data);
     };
@@ -67,14 +68,34 @@ export default function QuestsPage() {
       )
     );
   };**/
+  const applyUserUpdate = (latest) => {
+    if (!latest) return;
+    const raw = localStorage.getItem("duelhabit:user");
+    let current = null;
+    try {
+      current = raw ? JSON.parse(raw) : null;
+    } catch {
+      current = null;
+    }
+    const merged = { ...(current || {}), ...latest };
+    localStorage.setItem("duelhabit:user", JSON.stringify(merged));
+    window.dispatchEvent(new CustomEvent("duelhabit:user-updated", { detail: merged }));
+  };
+
   const handleComplete = async (questId) => {
-    await fetch(`http://localhost:8000/quests/complete/${questId}`, {
-      method: "POST",
-    });
-  
-    // re-fetch quests to update UI
     const userId = localStorage.getItem("userId");
-    const res = await fetch(`http://localhost:8000/quests/${userId}`);
+    await fetch(`${API_BASE}/quests/complete/${questId}`, {
+      method: "POST",
+    }).then((res) => res.json().catch(() => ({})))
+      .then((data) => {
+        if (data?.user) {
+          applyUserUpdate(data.user);
+        }
+      })
+      .catch((err) => console.error(err));
+
+    // re-fetch quests to update UI
+    const res = await fetch(`${API_BASE}/quests/${userId}`);
     const updated = await res.json();
     setQuests(updated);
   };
