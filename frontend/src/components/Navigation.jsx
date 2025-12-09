@@ -31,7 +31,7 @@ export default function Navigation() {
     { path: "/duels", icon: Swords, label: "Duels" },
     { path: "/quests", icon: Target, label: "Quests" },
     { path: "/groups", icon: Users, label: "Groups" },
-    { path: "/ranks", icon: Trophy, label: "Ranks" },
+    { path: "/leaderboard", icon: Trophy, label: "Ranks" },
     { path: "/profile", icon: User, label: "Profile" },
   ];
 

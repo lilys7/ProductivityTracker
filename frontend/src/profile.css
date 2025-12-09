@@ -2,6 +2,7 @@
   padding: 30px 20px;
   max-width: 600px;
   margin: 0 auto;
+  animation: fadeIn .4s ease;
 }
 
 .profile-card {

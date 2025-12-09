@@ -2,7 +2,6 @@
 .duelhub-wrapper {
   min-height: 100vh;
   padding: 40px 0 96px;
-  background: linear-gradient(135deg, #5c6cff, #bc84ff, #e6a270);
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -17,6 +16,7 @@
   border-radius: 32px;
   padding: 24px 24px 32px;
   box-shadow: 0 22px 40px rgba(0, 0, 0, 0.18);
+  animation: fadeIn .4s ease;
 }
 
 /* header + tabs */

@@ -1,0 +1,99 @@
+.leaderboard-page{
+    padding: 30px;
+    font-family: sans-serif;
+    background:#f7f7f7;
+    border-radius:20px;
+    animation: fadeIn .4s ease;
+  }
+  
+  .lb-title{
+    font-size:28px;
+    font-weight:600;
+  }
+  
+  .lb-subtitle{
+    margin-bottom:20px;
+    opacity:.7;
+  }
+  
+  .lb-rank-card{
+    background: linear-gradient(90deg, #8b66f1, #e6a34d);
+    border-radius:20px;
+    color:white;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+  }
+  
+  .lb-rank-number{
+    font-size:30px;
+    font-weight:700;
+  }
+  
+  .lb-rank-xp{
+    font-size:24px;
+    font-weight:700;
+  }
+  
+  .lb-top3{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:30px;
+  }
+  
+  /* winner in middle taller */
+  .position-1{
+    transform:scale(1.1);
+  }
+  
+  .lb-top-card{
+    background:white;
+    border-radius:20px;
+    padding:20px;
+    text-align:center;
+    width:120px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+  }
+  
+  .lb-avatar{
+    font-size:40px;
+    display:block;
+    margin-bottom:10px;
+  }
+  
+  .lb-user-name{
+    font-weight:600;
+    margin-bottom:5px;
+  }
+  
+  .lb-level{
+    font-size:14px;
+    opacity:.6;
+  }
+  
+  .lb-xp{
+    margin-top:10px;
+    font-weight:700;
+    color:#e6a34d;
+  }
+  
+  .lb-list{
+    margin-top:30px;
+  }
+  
+  .lb-row{
+    display:flex;
+    justify-content:space-between;
+    background:white;
+    padding:15px;
+    margin-bottom:10px;
+    border-radius:10px;
+  }
+  
+  .lb-rank{
+    font-weight:700;
+  }
+  

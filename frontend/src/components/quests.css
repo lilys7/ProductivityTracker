@@ -10,6 +10,7 @@ body {
     width: 100%;
     margin: 40px auto;
     padding: 0 16px 40px;
+    animation: fadeIn .4s ease;
   }
 
   /* central rounded "phone" card */
@@ -44,6 +45,7 @@ body {
     border-radius: 18px;
     padding: 16px 20px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    
   }
   
   .stat-label {

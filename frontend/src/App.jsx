@@ -16,6 +16,7 @@ import RanksPage from "./components/RanksPage";
 import Navigation from "./components/Navigation";
 import Signup from "./components/Signup";
 import AddQuest from "./components/AddQuests";
+import Leaderboard from "./components/Leaderboard";
 
 const onboardingPaths = new Set([
   "/get-started",
@@ -118,6 +119,8 @@ function App() {
         <Route path="/groups" element={renderMainScreen(<GroupsPage />)} />
         <Route path="/ranks" element={renderMainScreen(<RanksPage />)} />
         <Route path="/add-quests" element={renderMainScreen(<AddQuest />)} />
+        <Route path="/leaderboard" element={renderMainScreen(<Leaderboard />)} />
+
 
        
         <Route path="*" element={<Navigate to="/" replace />} />

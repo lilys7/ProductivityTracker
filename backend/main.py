@@ -33,19 +33,16 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
+class RegisterRequest(BaseModel):
+    email: EmailStr
+    password: str
+
 #add a quest ID as well to keep track of xp counts
 class QuestRequest(BaseModel):
-    _id: str
     userId: str
     title: str
     xp: int
     completed: bool = False
-
-class RegisterRequest(BaseModel):
-    email: EmailStr
-    password: str
-    #incorporate xp value as well
-    xp: int
 
 class DuelCreateRequest(BaseModel):
     #duel creator
@@ -323,6 +320,15 @@ async def login(payload: LoginRequest):
         "email": existing["email"],
         "created_at": existing.get("created_at"),
     }
+
+@app.get("/leaderboard")
+async def leaderboard():
+    db = get_db()
+    users = await db.users.find().sort("xp", -1).to_list(50)
+    for u in users:
+        u["_id"] = str(u["_id"])
+    return users
+
 
 #duel creation endpoint 
 @app.post("/duels")
