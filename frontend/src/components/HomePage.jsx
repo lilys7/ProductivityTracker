@@ -327,7 +327,7 @@ export default function HomePage() {
               </button>
               <button
                 className="home-link-btn"
-                onClick={() => navigate("/ranks")}
+                onClick={() => navigate("/leaderboard")}
               >
                 Leaderboard
               </button>
@@ -396,7 +396,7 @@ export default function HomePage() {
             </button>
             <button
               className="home-nav-card"
-              onClick={() => navigate("/ranks")}
+              onClick={() => navigate("/leaderboard")}
             >
               <span className="nav-icon">R</span>
               <div>
