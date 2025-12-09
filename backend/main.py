@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 import random
 import string
@@ -69,8 +70,18 @@ class GroupJoinRequest(BaseModel):
 class DuelAcceptRequest(BaseModel):
     userId: str
 
+class DuelCompleteRequest(BaseModel):
+    userId: str
+
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+
+def normalize_member_ids(raw_members) -> list[str]:
+    """Normalize group member ids to strings for consistent comparison."""
+    if not raw_members:
+        return []
+    return [str(m) for m in raw_members if m is not None]
 
 
 def generate_group_code(length: int = 5) -> str:
@@ -189,7 +200,8 @@ async def create_group(payload: GroupCreateRequest):
         "name": payload.name.strip(),
         "code": code,
         "ownerId": payload.userId,
-        "members": [payload.userId],
+        # keep member ids stored as strings so comparisons remain consistent
+        "members": normalize_member_ids([payload.userId]),
         "created_at": datetime.utcnow().isoformat(),
     }
     result = await db.groups.insert_one(doc)
@@ -222,7 +234,7 @@ async def join_group(payload: GroupJoinRequest):
 
     await db.groups.update_one(
         {"_id": group["_id"]},
-        {"$addToSet": {"members": payload.userId}},
+        {"$addToSet": {"members": str(payload.userId)}},
     )
     try:
         await db.users.update_one(
@@ -271,7 +283,7 @@ async def list_group_members(groupId: str):
     if not group:
         raise HTTPException(status_code=404, detail="Group not found.")
 
-    member_ids_raw = group.get("members", [])
+    member_ids_raw = normalize_member_ids(group.get("members", []))
     object_ids = []
     for mid in member_ids_raw:
         try:
@@ -319,6 +331,7 @@ async def login(payload: LoginRequest):
         "id": str(existing["_id"]),
         "email": existing["email"],
         "created_at": existing.get("created_at"),
+        "xp": existing.get("xp", 0),
     }
 
 @app.get("/leaderboard")
@@ -329,6 +342,25 @@ async def leaderboard():
         u["_id"] = str(u["_id"])
     return users
 
+
+@app.get("/users/{userId}")
+async def get_user(userId: str):
+    """Return a single user by id with their XP and metadata."""
+    db = get_db()
+    try:
+        user = await db.users.find_one({"_id": ObjectId(userId)})
+    except Exception:
+        user = None
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return {
+        "id": str(user["_id"]),
+        "email": user.get("email"),
+        "created_at": user.get("created_at"),
+        "xp": user.get("xp", 0),
+        "groups": [str(g) for g in user.get("groups", [])],
+    }
+
 @app.get("/leaderboard/{groupId}")
 async def group_leaderboard(groupId: str):
     db = get_db()
@@ -338,8 +370,13 @@ async def group_leaderboard(groupId: str):
     if not group:
         raise HTTPException(404, "Group not found")
 
-    # group.members = list of user ids
-    member_ids = [ObjectId(uid) for uid in group.get("members", [])]
+    # group.members = list of user ids (stored as strings); skip invalid ids
+    member_ids = []
+    for uid in group.get("members", []):
+        try:
+            member_ids.append(ObjectId(uid))
+        except Exception:
+            continue
 
     users = await db.users.find({"_id": {"$in": member_ids}}).sort("xp", -1).to_list(50)
 
@@ -365,9 +402,13 @@ async def create_duel(duel: DuelCreateRequest):
             group = None
         if not group:
             raise HTTPException(status_code=404, detail="Group not found.")
-        members = group.get("members", [])
-        if data.get("opponentId") not in members:
+        members = set(normalize_member_ids(group.get("members", [])))
+        opponent_id = str(data.get("opponentId"))
+        creator_id = str(data.get("userId"))
+        if opponent_id not in members:
             raise HTTPException(status_code=400, detail="Opponent must be in the group.")
+        if creator_id not in members:
+            raise HTTPException(status_code=400, detail="You must be in the group to start a duel.")
 
     # basic fields
     # Example XP formula: 250 base + 10 * targetHours
@@ -407,6 +448,10 @@ async def list_duels(userId: str):
         habit_raw = d.get("habit", "")
         habit_label = habit_raw.capitalize() if habit_raw else ""
         viewer_role = "creator" if d.get("userId") == userId else "opponent"
+        winner_id = str(d.get("winnerId")) if d.get("winnerId") is not None else None
+        viewer_result = d.get("result")
+        if winner_id:
+            viewer_result = "won" if winner_id == userId else "lost"
 
         # adjust progress so "you" is always the viewer
         if viewer_role == "creator":
@@ -428,7 +473,8 @@ async def list_duels(userId: str):
             "status": d.get("status", "pending"),
             "youPct": you_pct,
             "oppPct": opp_pct,
-            "result": d.get("result"),
+            "result": viewer_result,
+            "winnerId": winner_id,
             "viewerRole": viewer_role,
         })
 
@@ -460,6 +506,74 @@ async def accept_duel(duelId: str, payload: DuelAcceptRequest):
         "id": str(updated["_id"]),
         "status": updated.get("status"),
         "accepted_at": updated.get("accepted_at"),
+    }
+
+
+@app.post("/duels/{duelId}/complete")
+async def complete_duel(duelId: str, payload: DuelCompleteRequest):
+    """Mark a duel as complete. First finisher wins and gains XP."""
+    db = get_db()
+    try:
+        duel = await db.duels.find_one({"_id": ObjectId(duelId)})
+    except Exception:
+        duel = None
+    if not duel:
+        raise HTTPException(status_code=404, detail="Duel not found.")
+    if duel.get("status") != "active":
+        # If already completed, just return the stored state
+        if duel.get("status") == "completed":
+            return {
+                "id": str(duel["_id"]),
+                "status": duel.get("status"),
+                "winnerId": str(duel.get("winnerId")) if duel.get("winnerId") else None,
+            }
+        raise HTTPException(status_code=400, detail="Duel is not active.")
+
+    user_id = str(payload.userId)
+    creator_id = str(duel.get("userId"))
+    opponent_id = str(duel.get("opponentId"))
+
+    if user_id not in {creator_id, opponent_id}:
+        raise HTTPException(status_code=403, detail="Only duel participants can complete the duel.")
+
+    winner_id = user_id
+    xp_award = duel.get("xp", 0)
+
+    # atomically set status to completed; only the first finisher updates
+    update_res = await db.duels.update_one(
+        {"_id": duel["_id"], "status": "active"},
+        {
+            "$set": {
+                "status": "completed",
+                "winnerId": winner_id,
+                "completed_at": datetime.utcnow().isoformat(),
+            }
+        },
+    )
+
+    # Only award XP if we actually changed the document from active -> completed
+    if update_res.modified_count > 0 and xp_award:
+        try:
+            await db.users.update_one(
+                {"_id": ObjectId(winner_id)},
+                {"$inc": {"xp": xp_award}},
+            )
+        except Exception:
+            # don't fail request if XP update encounters a bad ID
+            pass
+
+    updated = await db.duels.find_one({"_id": duel["_id"]})
+    winner_user = None
+    try:
+        winner_user = await db.users.find_one({"_id": ObjectId(winner_id)})
+    except Exception:
+        winner_user = None
+
+    return {
+        "id": str(updated["_id"]),
+        "status": updated.get("status"),
+        "winnerId": str(updated.get("winnerId")) if updated.get("winnerId") else None,
+        "winnerXp": winner_user.get("xp") if winner_user else None,
     }
 
 

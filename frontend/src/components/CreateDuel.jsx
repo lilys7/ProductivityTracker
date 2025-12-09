@@ -27,39 +27,70 @@ export default function CreateDuel() {
   const [duration, setDuration] = useState(DURATIONS[0].id);
   const [groupId, setGroupId] = useState(localStorage.getItem("groupId") || "");
   const [groupName, setGroupName] = useState(localStorage.getItem("groupName") || "");
+  const [groups, setGroups] = useState([]);
   const [groupMembers, setGroupMembers] = useState([]);
   const [opponentId, setOpponentId] = useState("");
   const [loading, setLoading] = useState(false);
   const [memberError, setMemberError] = useState("");
 
-  // load group members from backend
+  // load all groups the user belongs to; any member can start a duel
   useEffect(() => {
-    const gid = localStorage.getItem("groupId");
-    if (!gid) {
-      setMemberError("Join or create a group before starting a duel.");
-      return;
-    }
-    setGroupId(gid);
-    setGroupName(localStorage.getItem("groupName") || "");
-    const fetchMembers = async () => {
+    const loadGroups = async () => {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        setMemberError("Log in first, then join or create a group.");
+        return;
+      }
+
       try {
-        const res = await fetch(`${API_BASE}/groups/${gid}/members`);
+        const resGroups = await fetch(`${API_BASE}/groups/${userId}`);
+        if (!resGroups.ok) throw new Error("Could not load your groups");
+        const groupsData = await resGroups.json();
+        setGroups(groupsData);
+        if (groupsData.length > 0) {
+          const gid = groupId || groupsData[0].id;
+          const gname = groupsData.find((g) => g.id === gid)?.name || groupsData[0].name || "";
+          setGroupId(gid);
+          setGroupName(gname);
+          localStorage.setItem("groupId", gid);
+          localStorage.setItem("groupName", gname);
+        } else {
+          setMemberError("Join or create a group before starting a duel.");
+        }
+      } catch (err) {
+        console.error(err);
+        setMemberError("Unable to load your groups.");
+      }
+    };
+
+    loadGroups();
+  }, []);
+
+  // load members for the selected group (any member can challenge)
+  useEffect(() => {
+    const loadMembers = async () => {
+      const userId = localStorage.getItem("userId");
+      if (!groupId || !userId) return;
+      try {
+        const res = await fetch(`${API_BASE}/groups/${groupId}/members`);
         if (!res.ok) throw new Error("Failed to load group members");
         const data = await res.json();
-        const me = localStorage.getItem("userId");
+        const me = userId;
         const filtered = (data.members || []).filter((m) => m.id !== me);
         setGroupMembers(filtered);
         setOpponentId(filtered?.[0]?.id || "");
         if (filtered.length === 0) {
           setMemberError("No other members in your group yet.");
+        } else {
+          setMemberError("");
         }
       } catch (e) {
         console.error(e);
         setMemberError("Unable to load group members.");
       }
     };
-    fetchMembers();
-  }, []);
+    loadMembers();
+  }, [groupId]);
 
   const goBack = () => {
     if (step > 1) {
@@ -164,6 +195,14 @@ export default function CreateDuel() {
         <StepOpponent
           groupId={groupId}
           groupName={groupName}
+          groups={groups}
+          onChangeGroup={(gid) => {
+            setGroupId(gid);
+            const gname = groups.find((g) => g.id === gid)?.name || "";
+            setGroupName(gname);
+            localStorage.setItem("groupId", gid || "");
+            localStorage.setItem("groupName", gname || "");
+          }}
           opponentId={opponentId}
           onChangeOpponent={setOpponentId}
           members={groupMembers}
@@ -293,7 +332,7 @@ function StepDuration({ duration, onChangeDuration }) {
   );
 }
 
-function StepOpponent({ groupId, groupName, opponentId, onChangeOpponent, members, error }) {
+function StepOpponent({ groupId, groupName, opponentId, onChangeOpponent, members, error, groups, onChangeGroup }) {
   return (
     <section className="create-section">
       <h2 className="create-section-title">Choose Opponent</h2>
@@ -301,15 +340,22 @@ function StepOpponent({ groupId, groupName, opponentId, onChangeOpponent, member
         Only members of your group can be challenged.
       </p>
 
-      {groupId && (
-        <div className="goal-summary">
-          Group: <strong>{groupName || groupId}</strong>
-        </div>
-      )}
-
-      {!groupId && (
-        <div className="goal-summary">Join or create a group first.</div>
-      )}
+      <div className="goal-summary">
+        <label className="goal-label" htmlFor="groupSelect">Group</label>
+        <select
+          id="groupSelect"
+          className="jg-input"
+          value={groupId}
+          onChange={(e) => onChangeGroup(e.target.value)}
+        >
+          {groups.length === 0 && <option value="">No groups yet</option>}
+          {groups.map((g) => (
+            <option key={g.id} value={g.id}>
+              {g.name || g.code || g.id}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {error && <div className="goal-summary">{error}</div>}
 

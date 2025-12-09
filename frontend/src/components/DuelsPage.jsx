@@ -17,6 +17,16 @@ export default function DuelsPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const [loadingId, setLoadingId] = useState(null);
+  const [completingId, setCompletingId] = useState(null);
+  const [userSnapshot, setUserSnapshot] = useState(() => {
+    const raw = localStorage.getItem("duelhabit:user");
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     async function loadDuels() {
@@ -94,6 +104,61 @@ export default function DuelsPage() {
     }
   };
 
+  const handleComplete = async (duelId) => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      setError("You must be logged in to complete duels.");
+      return;
+    }
+    setCompletingId(duelId);
+    try {
+      const res = await fetch(`${API_BASE}/duels/${duelId}/complete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || "Failed to complete duel");
+      }
+      const data = await res.json();
+
+      // if the current user won, pull fresh user stats and update storage/UI
+      if (data.winnerId === userId) {
+        try {
+          const userRes = await fetch(`${API_BASE}/users/${userId}`);
+          if (userRes.ok) {
+            const latestUser = await userRes.json();
+            const merged = { ...(userSnapshot || {}), ...latestUser };
+            localStorage.setItem("duelhabit:user", JSON.stringify(merged));
+            setUserSnapshot(merged);
+            window.dispatchEvent(new CustomEvent("duelhabit:user-updated", { detail: merged }));
+          }
+        } catch (err) {
+          console.error("Unable to refresh user after duel completion", err);
+        }
+      }
+
+      setDuels((prev) =>
+        prev.map((d) => {
+          if (d.id !== duelId) return d;
+          const result = data.winnerId
+            ? data.winnerId === userId
+              ? "won"
+              : "lost"
+            : d.result;
+          return { ...d, status: "completed", result };
+        })
+      );
+      setTab("completed");
+    } catch (e) {
+      console.error(e);
+      setError(e.message);
+    } finally {
+      setCompletingId(null);
+    }
+  };
+
   return (
     <div className="duelhub-wrapper">
       <div className="duelhub-card">
@@ -142,7 +207,12 @@ export default function DuelsPage() {
 
           {tab === "active" &&
             activeDuels.map((duel) => (
-              <ActiveDuelCard key={duel.id} duel={duel} />
+              <ActiveDuelCard
+                key={duel.id}
+                duel={duel}
+                onComplete={handleComplete}
+                loadingId={completingId}
+              />
             ))}
 
           {tab === "pending" &&
@@ -173,7 +243,7 @@ export default function DuelsPage() {
   );
 }
 
-function ActiveDuelCard({ duel }) {
+function ActiveDuelCard({ duel, onComplete, loadingId }) {
   const icon = HABIT_ICONS[duel.habit?.toLowerCase()] || "⚔️";
   return (
     <div className="duel-card">
@@ -205,6 +275,16 @@ function ActiveDuelCard({ duel }) {
           className="duel-progress-inner duel-progress-red"
           style={{ width: `${duel.oppPct ?? 0}%` }}
         />
+      </div>
+
+      <div className="duel-pending-banner">
+        <button
+          className="duelhub-tab-btn duelhub-tab-active"
+          onClick={() => onComplete(duel.id)}
+          disabled={loadingId === duel.id}
+        >
+          {loadingId === duel.id ? "Completing..." : "Mark as Complete"}
+        </button>
       </div>
     </div>
   );

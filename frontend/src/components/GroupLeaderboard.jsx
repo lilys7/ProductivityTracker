@@ -6,14 +6,17 @@ export default function GroupLeaderboard() {
   const { groupId } = useParams();
   const [users, setUsers] = useState([]);
   const userId = localStorage.getItem("userId");
+  const fetchData = async () => {
+    const res = await fetch(`http://localhost:8000/leaderboard/${groupId}`);
+    const data = await res.json();
+    setUsers(data);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch(`http://localhost:8000/leaderboard/${groupId}`);
-      const data = await res.json();
-      setUsers(data);
-    };
     fetchData();
+    const handleUserUpdated = () => fetchData();
+    window.addEventListener("duelhabit:user-updated", handleUserUpdated);
+    return () => window.removeEventListener("duelhabit:user-updated", handleUserUpdated);
   }, [groupId]);
 
   const myRank = users.findIndex(u => u._id === userId) + 1;

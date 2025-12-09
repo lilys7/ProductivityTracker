@@ -5,15 +5,17 @@ import { useNavigate } from "react-router-dom";
 export default function Leaderboard() {
   const [users, setUsers] = useState([]);
   const userId = localStorage.getItem("userId");
+  const fetchData = async () => {
+    const res = await fetch("http://localhost:8000/leaderboard");
+    const data = await res.json();
+    setUsers(data);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch("http://localhost:8000/leaderboard");
-      const data = await res.json();
-      setUsers(data);
-    };
-
     fetchData();
+    const handleUserUpdated = () => fetchData();
+    window.addEventListener("duelhabit:user-updated", handleUserUpdated);
+    return () => window.removeEventListener("duelhabit:user-updated", handleUserUpdated);
   }, []);
 
   // Rank of logged-in user
