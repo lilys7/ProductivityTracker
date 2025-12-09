@@ -1,4 +1,4 @@
-import "./CreateGroup.css";
+import "./createGroup.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "./api";
