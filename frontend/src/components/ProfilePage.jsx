@@ -5,8 +5,8 @@ export default function ProfilePageNEW() {
 
   // For now, dummy data. Later we connect it to backend.
   const user = {
-    name: "John Doe",
-    avatar: "https://i.pravatar.cc/150?img=12",
+    name: "Kimber Gonzalez Lopez",
+    avatar: "https://ca.slack-edge.com/T05TJ6YUXUM-U06AACWF31D-98feebfd5082-512",
     level: 7,
     xp: 1450,
     streak: 12,
@@ -41,10 +41,6 @@ export default function ProfilePageNEW() {
             </div>
           ))}
         </div>
-
-        <button className="edit-btn">
-          Edit Profile
-        </button>
 
         <button
           className="logout-btn"
