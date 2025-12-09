@@ -329,6 +329,26 @@ async def leaderboard():
         u["_id"] = str(u["_id"])
     return users
 
+@app.get("/leaderboard/{groupId}")
+async def group_leaderboard(groupId: str):
+    db = get_db()
+
+    # find group
+    group = await db.groups.find_one({"_id": ObjectId(groupId)})
+    if not group:
+        raise HTTPException(404, "Group not found")
+
+    # group.members = list of user ids
+    member_ids = [ObjectId(uid) for uid in group.get("members", [])]
+
+    users = await db.users.find({"_id": {"$in": member_ids}}).sort("xp", -1).to_list(50)
+
+    for u in users:
+        u["_id"] = str(u["_id"])
+
+    return users
+
+
 
 #duel creation endpoint 
 @app.post("/duels")
