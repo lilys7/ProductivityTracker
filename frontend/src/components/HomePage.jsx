@@ -138,6 +138,19 @@ export default function HomePage() {
     loadData();
   }, []);
 
+  const openQuests = quests.filter((q) => !q.completed);
+  const completedQuests = quests.length - openQuests.length;
+  const xpEarned = quests.filter((q) => q.completed).reduce((s, q) => s + (q.xp || 0), 0);
+  const xpReady = openQuests.reduce((s, q) => s + (q.xp || 0), 0);
+
+  const activeDuels = duels.filter((d) => d.status === "active");
+  const pendingDuels = duels.filter((d) => d.status === "pending");
+  const spotlightDuels = [...activeDuels, ...pendingDuels].slice(0, 3);
+  const spotlightQuests = openQuests.slice(0, 3);
+
+  const displayName = user?.username || user?.name || user?.email || "@habitmaster";
+  const streakDays = Number(localStorage.getItem("streakDays")) || rankSnapshot.streak;
+  
   return (
     <div>
       <p>HomePage loading…</p>
