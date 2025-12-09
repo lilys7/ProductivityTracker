@@ -39,6 +39,17 @@
     font-size: 17px;
     cursor: pointer;
   }
+
+  .leaderboard-btn {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #844aff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
   
   .join-btn {
     background: white;

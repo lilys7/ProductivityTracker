@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./groupsPage.css";
 import api from "./api";
+import { useNavigate } from "react-router-dom";
 
 export default function GroupsPage() {
   const [groups, setGroups] = useState([]);
@@ -11,6 +12,7 @@ export default function GroupsPage() {
   const [groupName, setGroupName] = useState("");
   const [joinCode, setJoinCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -182,6 +184,10 @@ export default function GroupsPage() {
               <p>Group Code</p>
               <div className="code">{g.code}</div>
             </div>
+
+            <button className="leaderboard-btn"onClick={() => navigate(`/leaderboard/${g.id}`)}>
+              View Leaderboard
+            </button>
           </div>
         ))}
       </div>
